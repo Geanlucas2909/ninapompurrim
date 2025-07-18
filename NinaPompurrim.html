@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pompurrim Mágica</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Pacifico', cursive;
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      color: #d23672;
+      overflow-x: hidden;
+      transition: background 0.5s, color 0.5s;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    body.dark-mode {
+      background: linear-gradient(135deg, #2a1a2e 0%, #1a0f1a 100%);
+      color: #ffb6c1;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 20px;
+      background: rgba(255, 255, 255, 0.8);
+      border-bottom-left-radius: 80px 40px;
+      border-bottom-right-radius: 80px 40px;
+      animation: fadeIn 2s ease-in;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 5;
+      backdrop-filter: blur(5px);
+      border: 2px solid rgba(255, 182, 193, 0.3);
+    }
+
+    body.dark-mode header {
+      background: rgba(58, 30, 58, 0.8);
+      border-color: rgba(210, 54, 114, 0.3);
+    }
+
+    header h1 {
+      font-size: 2.5em;
+      color: #d23672;
+      text-shadow: 2px 2px rgba(255, 182, 193, 0.5);
+    }
+
+    body.dark-mode header h1 {
+      color: #ff85c1;
+      text-shadow: 2px 2px rgba(74, 26, 58, 0.8);
+    }
+
+    .toggle-container {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 20;
+    }
+
+    .toggle-container button {
+      background-color: #d23672;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 15px;
+      cursor: pointer;
+      font-family: 'Pacifico', cursive;
+      box-shadow: 0 0 10px rgba(210, 54, 114, 0.5);
+      font-size: 0.9em;
+      transition: all 0.3s ease;
+    }
+
+    .toggle-container button:hover {
+      transform: scale(1.1);
+      background-color: #e84a88;
+    }
+
+    .sparkles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background-color: #ffb6c1;
+      border-radius: 50%;
+      opacity: 0.9;
+      animation: sparkleFall 5s linear infinite;
+      box-shadow: 0 0 10px #ffb6c1, 0 0 20px #ffb6c1;
+    }
+
+    @keyframes sparkleFall {
+      0% { transform: translateY(-10%); opacity: 1; }
+      100% { transform: translateY(110%); opacity: 0; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .content {
+      padding: 20px;
+      text-align: center;
+      animation: fadeIn 2s ease-in 1s forwards;
+      opacity: 0;
+      z-index: 2;
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .content p {
+      font-size: 1.3em;
+      color: #d23672;
+      text-shadow: 1px 1px rgba(255, 182, 193, 0.5);
+      margin-bottom: 20px;
+    }
+
+    body.dark-mode .content p {
+      color: #ff85c1;
+      text-shadow: 1px 1px rgba(74, 26, 58, 0.8);
+    }
+
+    .btn-magico {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 25px;
+      font-size: 1em;
+      color: white;
+      background-color: #d23672;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease, background-color 0.3s ease;
+      font-family: 'Pacifico', cursive;
+    }
+
+    .btn-magico:hover {
+      background-color: #e84a88;
+      transform: scale(1.1);
+    }
+
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 30px;
+      border-radius: 30px;
+      box-shadow: 0 0 25px rgba(210, 54, 114, 0.3);
+      z-index: 15;
+      animation: fadeIn 0.5s ease;
+      width: 80%;
+      max-width: 400px;
+      border: 2px solid #d23672;
+      backdrop-filter: blur(5px);
+    }
+
+    body.dark-mode .popup {
+      background-color: rgba(58, 30, 58, 0.9);
+    }
+
+    .popup p {
+      font-size: 1.2em;
+      color: #d23672;
+      margin-bottom: 15px;
+    }
+
+    body.dark-mode .popup p {
+      color: #ffb6c1;
+    }
+
+    .popup button {
+      margin-top: 15px;
+      background-color: #d23672;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 15px;
+      cursor: pointer;
+      font-family: 'Pacifico', cursive;
+      transition: all 0.3s ease;
+    }
+
+    .popup button:hover {
+      background-color: #e84a88;
+      transform: scale(1.05);
+    }
+
+    .lily-section {
+      background: rgba(255, 255, 255, 0.7);
+      padding: 40px 20px;
+      border-radius: 40px;
+      margin: 30px 20px;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(210, 54, 114, 0.3);
+      backdrop-filter: blur(5px);
+    }
+
+    body.dark-mode .lily-section {
+      background: rgba(58, 30, 58, 0.7);
+      border-color: rgba(210, 54, 114, 0.5);
+    }
+
+    .lily-section h2 {
+      text-align: center;
+      font-size: 2em;
+      color: #d23672;
+      animation: fadeIn 2s ease-in-out;
+      margin-bottom: 20px;
+    }
+
+    body.dark-mode .lily-section h2 {
+      color: #ff85c1;
+    }
+
+    .lilies {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+      gap: 15px;
+    }
+
+    /* NUEVOS ESTILOS PARA IMÁGENES CON IMG SRC */
+    .lily-container {
+      width: 150px;
+      height: 150px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      animation: floatLily 4s ease-in-out infinite;
+    }
+
+    .lily-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      transition: transform 0.3s ease;
+      filter: drop-shadow(0 0 10px rgba(255, 182, 193, 0.5));
+      border-radius: 20px;
+    }
+
+    .lily-container:hover .lily-img {
+      transform: scale(1.1) rotate(5deg);
+      filter: drop-shadow(0 0 15px rgba(255, 182, 193, 0.8));
+    }
+
+    @keyframes floatLily {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .flower-dynamic {
+      width: 100px;
+      height: 100px;
+      background-image: url('https://freepngimg.com/thumb/lily/3-2-lily-png-file.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      animation: rotateFlower 10s linear infinite;
+      margin: 20px auto;
+      transition: transform 0.5s ease;
+      filter: drop-shadow(0 0 10px rgba(255, 182, 193, 0.5));
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+    .flower-dynamic:hover {
+      animation: rotateFlower 3s linear infinite;
+      filter: drop-shadow(0 0 15px rgba(255, 182, 193, 0.8));
+    }
+
+    @keyframes rotateFlower {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Flor animada completa */
+    .animated-flower-container {
+      position: relative;
+      width: 100%;
+      height: 500px;
+      background: rgba(255, 255, 255, 0.7);
+      overflow: hidden;
+      margin: 30px auto;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      border: 1px solid rgba(210, 54, 114, 0.3);
+      backdrop-filter: blur(5px);
+    }
+
+    body.dark-mode .animated-flower-container {
+      background: rgba(8, 15, 26, 0.7);
+      border-color: rgba(210, 54, 114, 0.5);
+    }
+
+    .flower-container {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 300px;
+      height: 400px;
+    }
+
+    .flower-glass {
+      height: 300px;
+      width: 200px;
+      background: #122139;
+      border-radius: 100px 100px 0px 0px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .flower-glass:before {
+      content: "";
+      height: 20px;
+      width: 20px;
+      transform-origin: center;
+      border: 10px solid #122139;
+      border-radius: 100%;
+      position: absolute;
+      left: 80px;
+      top: -30px;
+    }
+
+    .flower-glass:after {
+      content: "";
+      position: absolute;
+      height: 10px;
+      width: 200px;
+      background: #a52a2a;
+      top: 100%;
+      left: 0%;
+    }
+
+    .flower-shine {
+      width: 10px;
+      height: 150px;
+      background: white;
+      opacity: 0.2;
+      position: absolute;
+      left: 85%;
+      top: 80px;
+      border-radius: 50px;
+      z-index: 10;
+    }
+
+    .flower-shine:before {
+      content: "";
+      width: 10px;
+      height: 20px;
+      position: absolute;
+      background: white;
+      top: 160px;
+      border-radius: 50px;
+    }
+
+    .flower-petals>div {
+      position: absolute;
+      background: #d52d58;
+      width: 50px;
+      height: 70px;
+      top: 80px;
+      transition: all 0.5s ease-out;
+    }
+
+    .flower-petals>div:nth-child(1) {
+      border-radius: 15px;
+      box-shadow: 0px 0px 30px rgba(245, 148, 184, 1);
+      left: 100px;
+      top: 80px;
+      background: #d52d58;
+    }
+
+    .flower-petals>div:nth-child(2),
+    .flower-petals>div:nth-child(4),
+    .flower-petals>div:nth-child(6) {
+      background: #b81b43;
+      left: 80px;
+      border-radius: 0px 30px 0px 30px;
+      transform-origin: bottom right;
+    }
+
+    .flower-petals>div:nth-child(3),
+    .flower-petals>div:nth-child(5),
+    .flower-petals>div:nth-child(7) {
+      background: #b81b43;
+      left: 120px;
+      border-radius: 30px 0px 30px 0px;
+      transform-origin: bottom left;
+    }
+
+    .flower-petals>div:nth-child(2) {
+      z-index: 5;
+      background: #ab1a3f;
+      top: 90px;
+      height: 70px;
+      box-shadow: 0px 0px 30px rgba(245, 148, 184, .5);
+      animation: bloom2 3s ease-in-out;
+      animation-fill-mode: forwards;
+    }
+
+    .flower-petals>div:nth-child(3) {
+      z-index: 4;
+      background: #ab1a3f;
+      top: 90px;
+      height: 70px;
+      box-shadow: 0px 0px 30px rgba(245, 148, 184, .5);
+      animation: bloom3 3s ease-in-out, glowing 2.5s ease-in-out infinite;
+      animation-fill-mode: forwards;
+    }
+
+    .flower-petals>div:nth-child(4) {
+      z-index: 3;
+      background: #b81b43;
+      top: 85px;
+      height: 75px;
+      box-shadow: 0px 0px 30px rgba(245, 148, 184, .5);
+      animation: bloom4 3s ease-in-out, glowing 2.5s ease-in-out infinite;
+      animation-fill-mode: forwards;
+    }
+
+    .flower-petals>div:nth-child(5) {
+      z-index: 2;
+      background: #b81b43;
+      top: 85px;
+      height: 75px;
+      box-shadow: 0px 0px 30px rgba(245, 148, 184, .5);
+      animation: bloom5 3s ease-in-out, glowing 2.5s ease-in-out infinite;
+      animation-fill-mode: forwards;
+    }
+
+    .flower-petals>div:nth-child(6) {
+      z-index: 1;
+      background: #c9204b;
+      top: 80px;
+      height: 70px;
+      box-shadow: 0px 0px 30px rgba(245, 148, 184, .3);
+      animation: bloom6 3s ease-in-out, glowing 2.5s ease-in-out infinite;
+      animation-fill-mode: forwards;
+    }
+
+    .flower-petals>div:nth-child(7) {
+      z-index: 0;
+      background: #c9204b;
+      top: 80px;
+      height: 70px;
+      box-shadow: 0px 0px 30px rgba(245, 148, 184, .3);
+      animation: bloom7 3s ease-in-out, glowing 2.5s ease-in-out infinite;
+      animation-fill-mode: forwards;
+    }
+
+    .flower-deadPetals>div {
+      position: absolute;
+      background: #d52d58;
+      width: 10px;
+      height: 8px;
+      top: 80px;
+      border-radius: 0px 15px 0px 15px;
+      box-shadow: 0px 0px 15px rgba(245, 148, 184, .5);
+      transition: all 0.5s ease-out;
+    }
+
+    .flower-deadPetals>div:nth-child(1) {
+      left: 30px;
+      transform: rotate(-30deg);
+      animation: falling 20s 4s ease-in-out infinite;
+    }
+
+    .flower-deadPetals>div:nth-child(2) {
+      left: 70px;
+      transform: rotate(-30deg);
+      animation: falling 20s 8s ease-in-out infinite;
+    }
+
+    .flower-deadPetals>div:nth-child(3) {
+      left: 150px;
+      transform: rotate(-30deg);
+      animation: falling 20s 12s ease-in-out infinite;
+    }
+
+    .flower-deadPetals>div:nth-child(4) {
+      left: 190px;
+      transform: rotate(-30deg);
+      animation: falling 20s 16s ease-in-out infinite;
+    }
+
+    .flower-leaves>div:nth-last-child(1) {
+      position: absolute;
+      width: 30px;
+      height: 15px;
+      background: #338f37;
+      top: 140px;
+      left: 110px;
+      border-radius: 60px;
+    }
+
+    .flower-leaves>div:nth-child(1) {
+      position: absolute;
+      width: 8px;
+      height: 160px;
+      background: #054c05;
+      top: 125px;
+      left: 120px;
+      border-radius: 0 0 60px 60px;
+    }
+
+    .flower-leaves>div:nth-child(2) {
+      position: absolute;
+      width: 30px;
+      height: 50px;
+      border-radius: 6px 45px 25px 45px;
+      background: #054c05;
+      transform-origin: bottom;
+      transform: rotate(-30deg);
+      top: 170px;
+      left: 100px;
+      box-shadow: inset 6px 6px #066406;
+    }
+
+    .flower-leaves>div:nth-child(3) {
+      position: absolute;
+      width: 30px;
+      height: 50px;
+      border-radius: 45px 1px 45px 25px;
+      background: #054c05;
+      transform-origin: bottom;
+      transform: rotate(30deg);
+      top: 150px;
+      left: 120px;
+      box-shadow: inset -6px 6px #066406;
+    }
+
+    .flower-thorns>div {
+      position: absolute;
+      width: 0;
+      height: 0;
+      top: 80px;
+    }
+
+    .flower-thorns>div:nth-child(odd) {
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 8px solid #054c05;
+      left: 125px;
+    }
+
+    .flower-thorns>div:nth-child(even) {
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-right: 8px solid #054c05;
+      left: 115px;
+    }
+
+    .flower-thorns>div:nth-child(1) {
+      top: 190px;
+    }
+
+    .flower-thorns>div:nth-child(2) {
+      top: 160px;
+    }
+
+    .flower-thorns>div:nth-child(4) {
+      top: 220px;
+    }
+
+    @keyframes bloom2 {
+      50% {
+        transform: rotate(-90deg);
+        top: 170px;
+        left: 60px;
+      }
+
+      100% {
+        transform: rotate(-60deg);
+        top: 260px;
+        left: 40px;
+        background: #71122a;
+        box-shadow: 0px 0px 0px rgba(245, 148, 184, 0);
+      }
+    }
+
+    @keyframes bloom3 {
+      100% {
+        transform: rotate(50deg);
+      }
+    }
+
+    @keyframes bloom4 {
+      100% {
+        transform: rotate(-25deg);
+      }
+    }
+
+    @keyframes bloom5 {
+      100% {
+        transform: rotate(25deg);
+      }
+    }
+
+    @keyframes bloom6 {
+      100% {
+        transform: rotate(-10deg);
+      }
+    }
+
+    @keyframes bloom7 {
+      100% {
+        transform: rotate(10deg);
+      }
+    }
+
+    @keyframes glowing {
+      50% {
+        background: #d7365f;
+        box-shadow: 0px 0px 30px rgba(245, 148, 184, 1);
+      }
+    }
+
+    @keyframes falling {
+      20% {
+        top: 140px;
+        background: #9d193b;
+        box-shadow: 0px 0px 0px rgba(245, 148, 184, 0);
+      }
+
+      100% {
+        top: 140px;
+        opacity: 0;
+      }
+    }
+
+    .flower-texto {
+      top: 85%;
+      color: #d23672;
+      font-size: 1.5em;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      width: 100%;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+
+    body.dark-mode .flower-texto {
+      color: #ffb6c1;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    }
+
+    /* Sección especial para la foto */
+    .photo-section {
+      position: relative;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .photo-frame {
+      width: 250px;
+      height: 250px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.5s ease;
+      border: 3px solid rgba(210, 54, 114, 0.5);
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+    }
+
+    body.dark-mode .photo-frame {
+      background: rgba(58, 30, 58, 0.7);
+      border-color: rgba(210, 54, 114, 0.7);
+    }
+
+    .photo-frame::before {
+      content: "";
+      position: absolute;
+      top: -5px;
+      left: -5px;
+      right: -5px;
+      bottom: -5px;
+      border: 2px dashed rgba(210, 54, 114, 0.5);
+      border-radius: 50%;
+      animation: rotateBorder 20s linear infinite;
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    @keyframes rotateBorder {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .photo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      transition: transform 0.5s ease;
+      border: 2px solid rgba(210, 54, 114, 0.3);
+    }
+
+    .photo-frame:hover img {
+      transform: scale(1.05);
+    }
+
+    .photo-caption {
+      margin-top: 20px;
+      font-size: 1.3em;
+      color: #d23672;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+      animation: fadeIn 2s ease;
+    }
+
+    body.dark-mode .photo-caption {
+      color: #ff85c1;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .pompurrim-gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 800px;
+    }
+
+    .pompurrim-gallery img {
+      width: 150px;
+      height: 150px;
+      object-fit: contain;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+      border: 2px solid rgba(210, 54, 114, 0.3);
+      cursor: pointer;
+    }
+
+    .pompurrim-gallery img:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 20px rgba(210, 54, 114, 0.3);
+    }
+
+    /* Nuevos elementos interactivos */
+    .floating-elements {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .floating-element {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      opacity: 0.7;
+      animation: floatElement 15s linear infinite;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: transform 0.3s ease;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .floating-element:hover {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+
+    @keyframes floatElement {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      25% { transform: translate(50vw, 25vh) rotate(90deg); }
+      50% { transform: translate(25vw, 50vh) rotate(180deg); }
+      75% { transform: translate(75vw, 75vh) rotate(270deg); }
+      100% { transform: translate(0, 0) rotate(360deg); }
+    }
+
+    .heart {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: #ff6b8b;
+      transform: rotate(45deg);
+      animation: floatHeart 10s linear infinite;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .heart:before, .heart:after {
+      content: "";
+      width: 20px;
+      height: 20px;
+      background-color: #ff6b8b;
+      border-radius: 50%;
+      position: absolute;
+    }
+
+    .heart:before {
+      top: -10px;
+      left: 0;
+    }
+
+    .heart:after {
+      top: 0;
+      left: -10px;
+    }
+
+    @keyframes floatHeart {
+      0% { top: 100%; left: 10%; opacity: 0; }
+      10% { opacity: 0.7; }
+      90% { opacity: 0.7; }
+      100% { top: -10%; left: 90%; opacity: 0; }
+    }
+
+    .star {
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background-color: #fff;
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+      animation: floatStar 15s linear infinite;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @keyframes floatStar {
+      0% { top: 100%; left: 20%; opacity: 0; transform: scale(0.5); }
+      10% { opacity: 0.8; transform: scale(1); }
+      90% { opacity: 0.8; transform: scale(1); }
+      100% { top: -10%; left: 80%; opacity: 0; transform: scale(0.5); }
+    }
+
+    .message-bubble {
+      position: fixed;
+      display: none;
+      background-color: rgba(255, 255, 255, 0.9);
+      border: 2px solid #d23672;
+      border-radius: 20px;
+      padding: 15px;
+      max-width: 250px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      z-index: 20;
+      animation: bubbleAppear 0.5s ease-out;
+      backdrop-filter: blur(5px);
+    }
+
+    body.dark-mode .message-bubble {
+      background-color: rgba(58, 30, 58, 0.9);
+    }
+
+    @keyframes bubbleAppear {
+      from { transform: scale(0); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .message-bubble p {
+      color: #d23672;
+      font-size: 1em;
+      margin: 0;
+      text-align: center;
+    }
+
+    body.dark-mode .message-bubble p {
+      color: #ffb6c1;
+    }
+
+    .message-bubble:after {
+      content: "";
+      position: absolute;
+      width: 0;
+      height: 0;
+      border: 15px solid transparent;
+      border-top-color: rgba(255, 255, 255, 0.9);
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    body.dark-mode .message-bubble:after {
+      border-top-color: rgba(58, 30, 58, 0.9);
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 1em;
+      color: white;
+      background-color: rgba(210, 54, 114, 0.8);
+      border-top-left-radius: 40px;
+      border-top-right-radius: 40px;
+      animation: fadeIn 1.5s ease;
+      margin-top: 30px;
+      border-top: 2px solid rgba(255, 182, 193, 0.5);
+      position: relative;
+      z-index: 5;
+      backdrop-filter: blur(5px);
+    }
+
+    body.dark-mode .footer {
+      background-color: rgba(58, 30, 58, 0.8);
+    }
+
+    .footer::after {
+      content: "Un lugar especial para alguien especial";
+      display: block;
+      margin-top: 10px;
+      font-size: 1em;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .footer button {
+      margin-top: 10px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 15px;
+      background-color: white;
+      color: #d23672;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      font-family: 'Pacifico', cursive;
+    }
+
+    .footer button:hover {
+      transform: scale(1.1);
+      background-color: #ffe4ef;
+    }
+
+    @media (max-width: 768px) {
+      header h1 {
+        font-size: 2em;
+      }
+      
+      .content p {
+        font-size: 1.1em;
+      }
+      
+      .lily-container {
+        width: 120px;
+        height: 120px;
+      }
+      
+      .animated-flower-container {
+        height: 400px;
+      }
+      
+      .flower-container {
+        width: 250px;
+        height: 300px;
+      }
+      
+      .flower-texto {
+        font-size: 1.2em;
+      }
+      
+      .photo-frame {
+        width: 200px;
+        height: 200px;
+      }
+      
+      .photo-caption {
+        font-size: 1.1em;
+      }
+      
+      .floating-element {
+        width: 40px;
+        height: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="toggle-container">
+    <button onclick="toggleDarkMode()">🌙/☀️ Modo</button>
+  </div>
+
+  <div class="sparkles" id="sparkles"></div>
+  <div class="floating-elements" id="floatingElements"></div>
+  <div class="message-bubble" id="messageBubble"></div>
+
+  <header>
+    <h1>Bienvenida al Mundo de Pompurrim ✨</h1>
+  </header>
+
+  <div class="content">
+    <p>¡Un lugar mágico donde todo brilla con dulzura y amor!</p>
+    <button class="btn-magico" onclick="mostrarPopup()">Haz clic para una sorpresa 💖</button>
+  </div>
+
+  <!-- Sección especial para la foto -->
+  <div class="photo-section">
+    <div class="photo-frame" onclick="showRandomMessage(this)">
+      <img src="Nina.jpg" alt="Alguien muy especial">
+    </div>
+    <div class="photo-caption">Una persona que ilumina el día con su presencia</div>
+  </div>
+
+  <div class="lily-section">
+    <h2>🌸 Jardín de Lirios Encantados 🌸</h2>
+    <div class="lilies">
+      <!-- NUEVA ESTRUCTURA CON IMG SRC -->
+      <div class="lily-container" onclick="showRandomMessage(this)">
+        <img src="LirioRosa.jpg" alt="Lirio rosado" class="lily-img">
+      </div>
+      <div class="lily-container" onclick="showRandomMessage(this)">
+        <img src="LirioMora.jpg" alt="Lirio fucsia" class="lily-img">
+      </div>
+      <div class="lily-container" onclick="showRandomMessage(this)">
+        <img src="LirioAzul.jpg" alt="Lirio blanco" class="lily-img">
+      </div>
+    </div>
+    <div class="flower-dynamic" onclick="showRandomMessage(this)"></div>
+
+    <!-- FLOR ANIMADA COMPLETA (se mantiene igual) -->
+    <div class="animated-flower-container">
+      <div class="flower-container">
+        <div class="flower-glass">
+          <div class="flower-shine"></div>
+        </div>
+        <div class="flower-thorns">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <div class="flower-leaves">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <div class="flower-petals">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <div class="flower-deadPetals">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+      <div><h4 class="flower-texto">Eres una persona increíble que merece todo lo mejor ❤️</h4></div>
+    </div>
+  </div>
+
+  <div class="pompurrim-gallery">
+    <img src="Op.jpg" alt="Pompompurin 1" onclick="showRandomMessage(this)">
+    <img src="Pp.gif" alt="Pompompurin 2" onclick="showRandomMessage(this)">
+    <img src="pP.jpg" alt="Pompompurin 3" onclick="showRandomMessage(this)">
+  </div>
+
+  <div class="popup" id="popup">
+    <p>¡Eres tan especial como una estrella brillante en el cielo de Pompurrim! 🌟</p>
+    <button onclick="cerrarPopup()">Cerrar</button>
+  </div>
+
+  <div class="footer">
+    Gracias por visitar este rincón encantado 💕 ¡Vuelve pronto!<br>
+    <button onclick="mostrarPopup()">Mensaje sorpresa 🌟</button>
+  </div>
+
+  <script>
+    // Mensajes de ánimo con Pompurrim
+    const motivationalMessages = [
+      "¡Eres increíble como Pompurrim con su sombrerito! 🎩",
+      "Tu sonrisa brilla más que el sol de Pompurrim ☀️",
+      "Eres tan dulce como el pudding de Pompurrim 🍮",
+      "¡Tienes el poder mágico de hacer feliz a cualquiera, como Pompurrim! ✨",
+      "Tu energía positiva contagia como la alegría de Pompurrim 🌈",
+      "Eres única y especial, ¡igual que Pompurrim! 💖",
+      "Nada puede detenerte, ¡eres más fuerte que Pompurrim después de su siesta! 💪",
+      "Tu corazón es tan grande como el amor que Pompurrim tiene por sus amigos 🥰",
+      "Eres la estrella más brillante en el cielo de Pompurrim 🌟",
+      "Tu actitud positiva es tan contagiosa como la sonrisa de Pompurrim 😊"
+    ];
+
+    function showRandomMessage(element) {
+      const bubble = document.getElementById('messageBubble');
+      const randomMessage = motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)];
+      
+      // Posicionar el globo de mensaje cerca del elemento clickeado
+      const rect = element.getBoundingClientRect();
+      bubble.style.top = (rect.top - 100) + 'px';
+      bubble.style.left = (rect.left + rect.width/2 - 125) + 'px';
+      
+      bubble.innerHTML = `<p>${randomMessage}</p>`;
+      bubble.style.display = 'block';
+      
+      // Ocultar después de 3 segundos
+      setTimeout(() => {
+        bubble.style.display = 'none';
+      }, 3000);
+    }
+
+    function mostrarPopup() {
+      document.getElementById("popup").style.display = "block";
+    }
+    
+    function cerrarPopup() {
+      document.getElementById("popup").style.display = "none";
+    }
+    
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark-mode");
+    }
+
+    // Crear brillos
+    const sparkles = document.getElementById('sparkles');
+    for (let i = 0; i < 30; i++) {
+      const sparkle = document.createElement('div');
+      sparkle.classList.add('sparkle');
+      sparkle.style.left = Math.random() * 100 + '%';
+      sparkle.style.animationDelay = (Math.random() * 5) + 's';
+      sparkles.appendChild(sparkle);
+    }
+
+    // Crear corazones flotantes (solo decorativos)
+    for (let i = 0; i < 10; i++) {
+      setTimeout(() => {
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.style.left = Math.random() * 100 + '%';
+        heart.style.animationDelay = (Math.random() * 5) + 's';
+        heart.style.animationDuration = (5 + Math.random() * 10) + 's';
+        document.body.appendChild(heart);
+      }, i * 1000);
+    }
+
+    // Crear estrellas flotantes (solo decorativas)
+    for (let i = 0; i < 10; i++) {
+      setTimeout(() => {
+        const star = document.createElement('div');
+        star.classList.add('star');
+        star.style.left = Math.random() * 100 + '%';
+        star.style.animationDelay = (Math.random() * 5) + 's';
+        star.style.animationDuration = (8 + Math.random() * 12) + 's';
+        star.style.opacity = '0';
+        document.body.appendChild(star);
+      }, i * 800);
+    }
+
+    // Crear elementos flotantes interactivos con bordes redondeados
+    const floatingElements = document.getElementById('floatingElements');
+    const floatingImages = [
+      'Pagina de Angelina/Ip.png',
+      'Pagina de Angelina/pP.jpg',
+      'Pagina de Angelina/Op.jpg',
+      'https://www.pngmart.com/files/3/Lily-Transparent-Background.png'
+    ];
+    
+    for (let i = 0; i < 8; i++) {
+      const element = document.createElement('div');
+      element.classList.add('floating-element');
+      element.style.backgroundImage = `url('${floatingImages[i % floatingImages.length]}')`;
+      element.style.top = Math.random() * 100 + '%';
+      element.style.left = Math.random() * 100 + '%';
+      element.style.animationDuration = (15 + Math.random() * 15) + 's';
+      element.style.animationDelay = (Math.random() * 5) + 's';
+      element.style.opacity = 0.5 + Math.random() * 0.5;
+      element.style.width = (40 + Math.random() * 40) + 'px';
+      element.style.height = (40 + Math.random() * 40) + 'px';
+      
+      element.addEventListener('click', function() {
+        showRandomMessage(this);
+        this.style.transform = 'scale(1.5)';
+        setTimeout(() => {
+          this.style.transform = 'scale(1)';
+        }, 500);
+      });
+      
+      floatingElements.appendChild(element);
+    }
+
+    // Efecto interactivo para las flores (actualizado para la nueva estructura)
+    document.querySelectorAll('.lily-container').forEach(container => {
+      container.addEventListener('mouseenter', () => {
+        container.style.animation = 'none';
+        container.offsetHeight; /* trigger reflow */
+        container.style.animation = 'floatLily 4s ease-in-out infinite';
+      });
+    });
+  </script>
+</body>
+</html>
